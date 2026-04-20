@@ -4,14 +4,15 @@ import { useEffect, useState } from "react";
 import Header from '@/components/Header';
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, Save, Download, Users, FileText, Image as ImageIcon, CheckCircle, Trash2 } from "lucide-react";
+import { LogOut, Save, Download, Users, FileText, Image as ImageIcon, CheckCircle, Trash2, Activity } from "lucide-react";
 
 export default function AdminDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState("");
-  const [activeTab, setActiveTab] = useState<"content" | "leads" | "gallery">("content");
+  const [activeTab, setActiveTab] = useState<"content" | "leads" | "gallery" | "analytics">("content");
   const [content, setContent] = useState<any[]>([]);
   const [leads, setLeads] = useState<any[]>([]);
+  const [traffic, setTraffic] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -47,6 +48,9 @@ export default function AdminDashboard() {
     } else if (activeTab === "leads") {
       const { data } = await supabase.from("leads").select("*").order("created_at", { ascending: false });
       setLeads(data || []);
+    } else if (activeTab === "analytics") {
+      const { data } = await supabase.from("site_traffic").select("*").order("created_at", { ascending: false }).limit(50);
+      setTraffic(data || []);
     }
     setLoading(false);
   }
@@ -133,6 +137,7 @@ export default function AdminDashboard() {
             {[
               { id: "content", label: "Content Editor", icon: FileText },
               { id: "leads", label: "Lead Pipeline", icon: Users },
+              { id: "analytics", label: "Live Traffic", icon: Activity },
               { id: "gallery", label: "Media Vault", icon: ImageIcon },
             ].map((tab) => (
               <button 
@@ -196,6 +201,51 @@ export default function AdminDashboard() {
                           )}
                         </div>
                       ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === "analytics" && (
+                <motion.div 
+                  key="analytics"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-8"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="glass p-6 rounded-xl border-white/5">
+                      <p className="text-[10px] font-black uppercase text-white/40 mb-2">Total Signals</p>
+                      <h3 className="text-3xl font-black italic text-primary">{traffic.length === 50 ? "50+" : traffic.length}</h3>
+                    </div>
+                    <div className="glass p-6 rounded-xl border-white/5">
+                      <p className="text-[10px] font-black uppercase text-white/40 mb-2">System Status</p>
+                      <h3 className="text-3xl font-black italic text-green-500 uppercase tracking-tighter">Monitoring</h3>
+                    </div>
+                    <div className="glass p-6 rounded-xl border-white/5">
+                      <p className="text-[10px] font-black uppercase text-white/40 mb-2">Vercel Status</p>
+                      <h3 className="text-3xl font-black italic text-white uppercase tracking-tighter">Linked</h3>
+                    </div>
+                  </div>
+
+                  <div className="glass p-8 rounded-2xl border-white/5">
+                    <h2 className="text-xl font-black italic uppercase tracking-tight mb-8">LIVE TRAFFIC FEED</h2>
+                    <div className="space-y-4">
+                      {traffic.map((t) => (
+                        <div key={t.id} className="flex items-center justify-between p-4 border-b border-white/5 last:border-0 group">
+                          <div className="flex flex-col">
+                            <span className="text-xs font-black uppercase italic text-white group-hover:text-primary transition-colors">{t.page_path}</span>
+                            <span className="text-[8px] font-mono text-white/20 uppercase">Referrer: {t.referrer}</span>
+                          </div>
+                          <span className="text-[8px] font-mono text-white/40 uppercase">{new Date(t.created_at).toLocaleString()}</span>
+                        </div>
+                      ))}
+                      {traffic.length === 0 && (
+                        <div className="py-12 text-center text-white/20 font-black italic uppercase tracking-widest">
+                          Awaiting first signal...
+                        </div>
+                      )}
                     </div>
                   </div>
                 </motion.div>

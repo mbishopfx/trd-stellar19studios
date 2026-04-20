@@ -10,6 +10,25 @@ import LeadForm from '@/components/LeadForm';
 import Link from 'next/link';
 import { supabase } from "@/lib/supabase";
 
+const InstagramIcon = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+  </svg>
+);
+
 export default function Home() {
   const [content, setContent] = useState<Record<string, string>>({});
 
@@ -190,11 +209,20 @@ export default function Home() {
               The premium destination for podcasters, streamers, and photographers. Aggressive production for aggressive creators. Built on the Mile21Media infrastructure.
             </p>
             <div className="flex gap-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="w-10 h-10 rounded-lg glass flex items-center justify-center hover:bg-primary transition-colors cursor-pointer group">
-                  <div className="w-4 h-4 bg-white/20 group-hover:bg-white rounded-sm transition-colors" />
-                </div>
-              ))}
+              <a 
+                href="https://www.instagram.com/stellar19studios" 
+                target="_blank"
+                className="w-12 h-12 rounded-xl glass flex items-center justify-center text-white/40 hover:text-primary hover:border-primary/50 transition-all group"
+              >
+                <InstagramIcon size={20} />
+              </a>
+              <a 
+                href="https://www.instagram.com/davesturchio/" 
+                target="_blank"
+                className="w-12 h-12 rounded-xl glass flex items-center justify-center text-white/40 hover:text-primary hover:border-primary/50 transition-all group"
+              >
+                <InstagramIcon size={20} className="opacity-50 group-hover:opacity-100" />
+              </a>
             </div>
           </div>
           
@@ -229,8 +257,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between gap-6 text-[10px] text-white/20 font-mono tracking-widest uppercase">
           <p>© 2026 STELLAR19 STUDIOS. ALL RIGHTS RESERVED. POWERED BY MILE21MEDIA.</p>
           <div className="flex gap-8">
+            <Link href="/privacy" className="hover:text-primary cursor-pointer">Privacy Protocol</Link>
             <span className="hover:text-primary cursor-pointer">Terms of Signal</span>
-            <span className="hover:text-primary cursor-pointer">Privacy Frequency</span>
           </div>
         </div>
       </footer>

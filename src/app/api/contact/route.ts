@@ -21,7 +21,8 @@ export async function POST(req: Request) {
 
     const mailOptions = {
       from: user,
-      to: "matt@mile21media.com", // Adjust as needed
+      to: "miles21media@gmail.com",
+      cc: "info@stellar19studios.com",
       subject: `NEW LEAD: ${name} - ${service}`,
       text: `
         Name: ${name}
@@ -38,6 +39,9 @@ export async function POST(req: Request) {
           <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 10px;">
             <p><strong>Message:</strong></p>
             <p>${message}</p>
+          </div>
+          <div style="margin-top: 20px; font-size: 10px; color: #666;">
+            STELLAR19 STUDIOS INBOUND SIGNAL
           </div>
         </div>
       `,

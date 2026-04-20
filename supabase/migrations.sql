@@ -49,6 +49,21 @@ CREATE TABLE IF NOT EXISTS public.studio_gallery (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- Site Traffic / Analytics Table
+CREATE TABLE IF NOT EXISTS public.site_traffic (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  page_path TEXT NOT NULL,
+  referrer TEXT,
+  user_agent TEXT,
+  ip_hash TEXT, -- To track unique visits without storing PII
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- RLS for Analytics (Public can only INSERT)
+ALTER TABLE public.site_traffic ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Insert Traffic" ON public.site_traffic FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admin All Traffic" ON public.site_traffic FOR ALL USING (auth.uid() = '3f674973-4196-4ecc-b159-001da23e5bec');
+
 -- RLS Policies (Enable Read for All, Write for Authenticated)
 ALTER TABLE public.site_content ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public Read" ON public.site_content FOR SELECT USING (true);

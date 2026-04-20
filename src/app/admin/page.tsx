@@ -4,15 +4,16 @@ import { useEffect, useState } from "react";
 import Header from '@/components/Header';
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, Save, Download, Users, FileText, Image as ImageIcon, CheckCircle, Trash2, Activity } from "lucide-react";
+import { LogOut, Save, Download, Users, FileText, Image as ImageIcon, CheckCircle, Trash2, Activity, Box } from "lucide-react";
 
 export default function AdminDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState("");
-  const [activeTab, setActiveTab] = useState<"content" | "leads" | "gallery" | "analytics">("content");
+  const [activeTab, setActiveTab] = useState<"content" | "leads" | "gallery" | "analytics" | "spaces">("content");
   const [content, setContent] = useState<any[]>([]);
   const [leads, setLeads] = useState<any[]>([]);
   const [traffic, setTraffic] = useState<any[]>([]);
+  const [spaces, setSpaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -51,9 +52,19 @@ export default function AdminDashboard() {
     } else if (activeTab === "analytics") {
       const { data } = await supabase.from("site_traffic").select("*").order("created_at", { ascending: false }).limit(50);
       setTraffic(data || []);
+    } else if (activeTab === "spaces") {
+      const { data } = await supabase.from("studio_spaces").select("*").order("order_index");
+      setSpaces(data || []);
     }
     setLoading(false);
   }
+
+  const handleUpdateSpace = async (id: string, updates: any) => {
+    setSaving(true);
+    await supabase.from("studio_spaces").update(updates).eq("id", id);
+    fetchData();
+    setSaving(false);
+  };
 
   const handleUpdateContent = async (key: string, value: string) => {
     setSaving(true);
@@ -137,6 +148,7 @@ export default function AdminDashboard() {
             {[
               { id: "content", label: "Content Editor", icon: FileText },
               { id: "leads", label: "Lead Pipeline", icon: Users },
+              { id: "spaces", label: "Spaces Manager", icon: Box },
               { id: "analytics", label: "Live Traffic", icon: Activity },
               { id: "gallery", label: "Media Vault", icon: ImageIcon },
             ].map((tab) => (
@@ -246,6 +258,58 @@ export default function AdminDashboard() {
                           Awaiting first signal...
                         </div>
                       )}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === "spaces" && (
+                <motion.div 
+                  key="spaces"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-8"
+                >
+                  <div className="glass p-8 rounded-2xl border-white/5">
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-xl font-black italic uppercase tracking-tight">STUDIO ENVIRONMENTS</h2>
+                      {saving && <span className="text-primary animate-pulse text-[10px] font-black italic uppercase">Updating...</span>}
+                    </div>
+                    <div className="space-y-12">
+                      {spaces.map((space) => (
+                        <div key={space.id} className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 bg-white/5 rounded-xl border border-white/5 hover:border-primary/20 transition-all">
+                          <div className="space-y-4">
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-white/40">Studio Name</label>
+                              <input 
+                                type="text"
+                                defaultValue={space.title}
+                                onBlur={(e) => handleUpdateSpace(space.id, { title: e.target.value })}
+                                className="w-full bg-black/40 border border-white/10 p-3 text-sm font-bold uppercase italic focus:border-primary outline-none"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-white/40">URL Slug</label>
+                              <input 
+                                type="text"
+                                defaultValue={space.slug}
+                                onBlur={(e) => handleUpdateSpace(space.id, { slug: e.target.value })}
+                                className="w-full bg-black/40 border border-white/10 p-3 text-[10px] font-mono focus:border-primary outline-none"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-white/40">Description</label>
+                            <textarea 
+                              rows={5}
+                              defaultValue={space.description}
+                              onBlur={(e) => handleUpdateSpace(space.id, { description: e.target.value })}
+                              className="w-full bg-black/40 border border-white/10 p-3 text-sm font-light leading-relaxed focus:border-primary outline-none resize-none italic"
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </motion.div>

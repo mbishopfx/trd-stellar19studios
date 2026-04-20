@@ -31,19 +31,28 @@ const InstagramIcon = ({ size = 20, className = "" }: { size?: number, className
 
 export default function Home() {
   const [content, setContent] = useState<Record<string, string>>({});
+  const [spaces, setSpaces] = useState<any[]>([]);
 
   useEffect(() => {
-    async function fetchContent() {
-      const { data } = await supabase.from("site_content").select("key, value");
-      if (data) {
-        const contentMap = data.reduce((acc, item) => {
+    async function fetchData() {
+      const [contentRes, spacesRes] = await Promise.all([
+        supabase.from("site_content").select("key, value"),
+        supabase.from("studio_spaces").select("*").order("order_index")
+      ]);
+
+      if (contentRes.data) {
+        const contentMap = contentRes.data.reduce((acc, item) => {
           acc[item.key] = item.value;
           return acc;
         }, {} as Record<string, string>);
         setContent(contentMap);
       }
+
+      if (spacesRes.data && spacesRes.data.length > 0) {
+        setSpaces(spacesRes.data);
+      }
     }
-    fetchContent();
+    fetchData();
   }, []);
 
   const fadeIn = {
@@ -129,21 +138,34 @@ export default function Home() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <StudioCard 
-            title="THE CAGE"
-            description="4K eyes. 32-bit ears. This isn't a basement. It's a broadcast-ready war room for 1-4 people."
-            href="/spaces/podcast"
-          />
-          <StudioCard 
-            title="THE FLASH"
-            description="Pure light. Zero excuses. Multi-backdrop sets that make your vision hit like a lariat."
-            href="/spaces/photography"
-          />
-          <StudioCard 
-            title="THE SIGNAL"
-            description="Zero lag. Dedicated fiber. Direct-to-consumer dominance. OBS-ready and bulletproof."
-            href="/spaces/streaming"
-          />
+          {spaces.length > 0 ? (
+            spaces.map((space) => (
+              <StudioCard 
+                key={space.id}
+                title={space.title}
+                description={space.description}
+                href={`/spaces/${space.slug}`}
+              />
+            ))
+          ) : (
+            <>
+              <StudioCard 
+                title="THE CAGE"
+                description="4K eyes. 32-bit ears. This isn't a basement. It's a broadcast-ready war room for 1-4 people."
+                href="/spaces/podcast"
+              />
+              <StudioCard 
+                title="THE FLASH"
+                description="Pure light. Zero excuses. Multi-backdrop sets that make your vision hit like a lariat."
+                href="/spaces/photography"
+              />
+              <StudioCard 
+                title="THE SIGNAL"
+                description="Zero lag. Dedicated fiber. Direct-to-consumer dominance. OBS-ready and bulletproof."
+                href="/spaces/streaming"
+              />
+            </>
+          )}
         </div>
       </section>
 

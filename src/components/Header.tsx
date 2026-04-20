@@ -13,12 +13,12 @@ export default function Header() {
       className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 px-6 py-5 flex items-center justify-between"
     >
       <Link href="/" className="flex items-center gap-4 group">
-        <div className="relative w-12 h-12 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
+        <div className="relative w-16 h-16 transition-transform duration-500 group-hover:scale-110">
           <Image 
-            src="/assets/logos/s19-wrestling.svg" 
-            alt="S19 Logo" 
+            src="/assets/logos/stellar19studioslogo.png" 
+            alt="Stellar19 Logo" 
             fill 
-            className="object-contain drop-shadow-[0_0_10px_#FF007F]"
+            className="object-contain"
           />
         </div>
         <div className="flex flex-col">

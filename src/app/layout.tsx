@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Stellar19 Studios | The Ultimate Content House",
   description: "Podcast studio, photography space, and live streaming environments for serious creators.",
+  icons: {
+    icon: "/assets/logos/s19-wrestling.svg",
+  },
 };
 
 export default function RootLayout({
